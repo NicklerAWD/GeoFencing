@@ -52,9 +52,11 @@ public class GeoFenceServer extends Service implements LocationListener {
                     break;
                 case ADD_GEOFENCE:
                     mValue = (GeoFencePoint)msg.obj;
+                    addGeoFencePoint(mValue);
                     break;
                 case REMOVE_GEOFENCE:
                     GFPindex = msg.arg1;
+                    RemoveGeoFencePoint(GFPindex);
                     break;
                 case GET_GEOFENCES_LIST:
                     try {
@@ -69,9 +71,11 @@ public class GeoFenceServer extends Service implements LocationListener {
         }
     }
 
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
+
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mMessenger.getBinder();
     }
 
     @Override
@@ -79,7 +83,9 @@ public class GeoFenceServer extends Service implements LocationListener {
         Log.i(TAG, "Service Started");
         //Assign the location service for the location
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        //But no request or register until we get a geofence (Saving power)
+        mCurrentLocation = new location();
+        mLocationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 0, 0, this);
+        //mLocationManager.addGpsStatusListener(this);
     }
 
     @Override

@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nicklerinc.geofenceservice">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -14,12 +16,13 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.ACTION_SHUTDOWN" />
-
+                <action android:name="com.nicklerinc.geofenceservice.StopGeoFencingService" />
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </receiver>
         <service
             android:name="com.nicklerinc.geofenceservice.GeoFenceServer"
+            android:process=":remote"
             android:enabled="true">
             <intent-filter>
                 <action android:name="com.nicklerinc.geofenceservice.GeoFenceServer" />

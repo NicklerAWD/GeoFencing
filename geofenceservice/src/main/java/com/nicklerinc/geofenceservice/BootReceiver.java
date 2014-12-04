@@ -14,8 +14,16 @@ public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
-            context.startService(new Intent(context, GeoFenceServer.class));
-            Log.i(TAG, "Starting Service GeoFenceServer");
+            if(intent.getAction().equals("android.intent.action.BOOT_COMPLETED")){
+                Log.i(TAG, "Starting Service GeoFenceServer");
+                context.startService(new Intent(context, GeoFenceServer.class));
+            }else if (intent.getAction().equals("android.intent.action.ACTION_SHUTDOWN")) {
+                Log.d(TAG, "Shutdown Complete");
+                context.stopService(new Intent(context, GeoFenceServer.class));
+            }else if (intent.getAction().equals("com.nicklerinc.geofenceservice.StopGeoFencingService")) {
+                Log.d(TAG, "Stopping the service");
+                context.stopService(new Intent(context, GeoFenceServer.class));
+            }
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
