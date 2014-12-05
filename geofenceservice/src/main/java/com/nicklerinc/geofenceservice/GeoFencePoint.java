@@ -16,4 +16,13 @@ public class GeoFencePoint {
     public float[] GetPoint() {
         return new float[]{point_lat, point_longi, point_radius};
     }
+    public float GetLatitude() {
+        return point_lat;
+    }
+    public float GetLongitude() {
+        return point_longi;
+    }
+    public float GetRadius() {
+        return point_radius;
+    }
 }

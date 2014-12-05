@@ -23,7 +23,6 @@ public class GeoFenceServer extends Service implements LocationListener {
 
     private String TAG = "GeoFenceServer";
     private LocationManager mLocationManager = null;
-    private location mCurrentLocation = null;
     private String TAG2 = "GeoLocationListener";
     private List<GeoFencePoint> ListGFP = null;
     ArrayList<Messenger> mClients = new ArrayList<Messenger>();
@@ -37,6 +36,10 @@ public class GeoFenceServer extends Service implements LocationListener {
     static final int REMOVE_GEOFENCE = 4;
     static final int GET_GEOFENCES_LIST = 5;
     static final int GEOFENCES_LIST_BACK = 6;
+
+    private float CheckLat = 0;
+    private float CheckLongi = 0;
+    private float CheckRadius = 0;
     /**
      * Handler of incoming messages from clients.
      */
@@ -83,7 +86,6 @@ public class GeoFenceServer extends Service implements LocationListener {
         Log.i(TAG, "Service Started");
         //Assign the location service for the location
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        mCurrentLocation = new location();
         mLocationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 0, 0, this);
         //mLocationManager.addGpsStatusListener(this);
     }
@@ -94,6 +96,12 @@ public class GeoFenceServer extends Service implements LocationListener {
         // We want this service to continue running until it is explicitly
         // stopped, so return sticky.
         return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.i(TAG, "Service stopped");
+        mLocationManager.removeUpdates(this);
     }
 
     //Method for handling the GeoFencePoint
@@ -146,13 +154,8 @@ public class GeoFenceServer extends Service implements LocationListener {
      */
     @Override
     public void onLocationChanged(Location loc) {
-        String longitude = "Longitude: " + loc.getLongitude();
-        Log.v(TAG2, longitude);
-        String latitude = "Latitude: " + loc.getLatitude();
-        Log.v(TAG2, latitude);
-        mCurrentLocation.setLocation(loc.getLatitude(), loc.getLongitude(), loc.getAccuracy());
         if (ListGFP != null) {
-            IsInCircle();
+            IsInCircle(loc.getLongitude(),loc.getLatitude(),loc.getAccuracy());
         }
     }
 
@@ -186,7 +189,16 @@ public class GeoFenceServer extends Service implements LocationListener {
      *
      * @return
      */
-    private boolean IsInCircle() {
-        return true;
+    private boolean IsInCircle(double CurrentLatitude, double Currentlongitude, double CurrentAccuracy ) {
+        for (GeoFencePoint element : ListGFP){
+            CheckLat = element.GetLatitude();
+            CheckLongi = element.GetLongitude();
+            CheckRadius = element.GetRadius();
+
+            if((CheckRadius*CheckRadius) <= (float)Math.pow(CheckLat-(float)CurrentLatitude,2) + (float)Math.pow(CheckLongi-(float)Currentlongitude,2)){
+                return true;
+            }
+        }
+        return false;
     }
 }
